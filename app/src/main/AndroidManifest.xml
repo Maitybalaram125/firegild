@@ -7,11 +7,10 @@
     <application
         android:allowBackup="false"
         android:label="FIREGILD"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
-        android:usesCleartextTraffic="true">
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.firegild.app.MainActivity"
             android:exported="true">
 
             <intent-filter>
@@ -20,5 +19,6 @@
             </intent-filter>
 
         </activity>
+
     </application>
 </manifest>
