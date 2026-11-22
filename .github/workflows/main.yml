@@ -35,7 +35,7 @@ jobs:
           cp index.html home.html signup.html recharge.html app/src/main/assets/
 
       - name: Build APK
-        run: gradle assembleDebug
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
