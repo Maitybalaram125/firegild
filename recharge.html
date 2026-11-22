@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Recharge</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+
+body{
+  min-height:100vh;
+  padding:20px 14px 35px;
+  color:white;
+  background:linear-gradient(145deg,#5548f4,#397fc6,#13a99e);
+}
+
+.container{max-width:650px;margin:auto}
+
+.profile{
+  display:flex;align-items:center;gap:14px;
+  margin:5px 4px 28px;
+}
+
+.avatar{
+  width:68px;height:68px;border-radius:50%;
+  background:#00ced1;border:3px solid white;
+  overflow:hidden;display:flex;align-items:center;
+  justify-content:center;font-size:24px;font-weight:bold;
+  flex-shrink:0;
+}
+
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profile-info{min-width:0}
+.profile h2{font-size:21px;margin-bottom:5px}
+.profile p{font-size:15px;opacity:.9}
+
+.balance{
+  padding:25px 22px;
+  border-radius:24px;
+  border:2px solid #fff;
+  background:linear-gradient(110deg,#ed3980,#8338f4);
+  box-shadow:0 0 15px #00ffff99;
+  display:flex;align-items:center;
+  justify-content:space-between;gap:10px;
+}
+
+.balance-title{font-size:19px;margin-bottom:8px}
+.balance-amount{font-size:clamp(27px,7vw,40px);font-weight:bold}
+
+.history-btn{
+  border:0;border-radius:9px;padding:11px 16px;
+  color:white;background:#3985c9;font-size:17px;
+  cursor:pointer;flex-shrink:0;
+}
+
+.operator-area{
+  display:flex;justify-content:center;gap:25px;
+  margin:25px 0;
+}
+
+.operator{
+  width:83px;height:83px;border-radius:50%;
+  border:4px solid #00eaff;
+  background:white;color:#222;
+  font-size:23px;font-weight:bold;
+  cursor:pointer;transition:.2s;
+}
+
+.operator.airtel{color:#e60012}
+.operator.vi{color:#e31837}
+.operator.jio{color:#092b9e}
+
+.operator.active{
+  box-shadow:0 0 0 4px white,0 0 20px #00ffff;
+  transform:scale(1.06);
+}
+
+.input-box{
+  display:block;width:90%;max-width:450px;
+  margin:16px auto;padding:16px 12px;
+  border:3px solid #ddd;border-radius:15px;
+  background:#fff;color:#222;
+  text-align:center;font-size:20px;
+  outline:none;
+  box-shadow:inset 0 2px 7px #0003,0 2px 5px #0003;
+}
+
+.input-box:focus{border-color:#00dce8}
+
+.amount-box{max-width:280px}
+
+.recharge-btn{
+  display:block;width:65%;max-width:340px;
+  margin:35px auto 40px;padding:20px 10px;
+  border:3px solid #00eaff;border-radius:19px;
+  background:linear-gradient(120deg,#00e5e5,#00b9c8);
+  color:#071b25;font-size:23px;font-weight:bold;
+  box-shadow:inset 0 0 15px #007d8b,0 0 12px #00ffff99;
+  cursor:pointer;
+}
+
+.details-box{
+  min-height:250px;
+  padding:20px;
+  border:2px solid #657eb6;
+  border-radius:12px;
+  background:#ffffff35;
+  color:white;
+}
+
+.details-heading{
+  font-size:21px;font-weight:bold;
+  margin-bottom:16px;
+}
+
+.empty-message{
+  text-align:center;
+  padding:65px 8px;
+  color:#f2f2f2;
+  font-size:16px;
+  line-height:1.6;
+}
+
+.plan-card{
+  background:#191919;
+  border:1px solid #444;
+  border-radius:17px;
+  overflow:hidden;
+  margin-bottom:12px;
+  color:#eee;
+}
+
+.plan-top{padding:20px}
+
+.plan-price{
+  font-size:34px;font-weight:bold;
+  margin-bottom:18px;
+}
+
+.plan-meta{
+  display:flex;gap:30px;
+  color:#bbb;font-size:16px;
+}
+
+.plan-meta strong{
+  display:block;color:#eee;
+  font-size:17px;margin-top:5px;
+}
+
+.plan-description{
+  border-top:2px solid #444;
+  padding:17px 20px;
+  color:#bbb;font-size:16px;
+  line-height:1.55;
+}
+
+.plan-icons{
+  margin-top:13px;font-size:23px;
+  letter-spacing:5px;
+}
+
+.plan-details{
+  display:inline-block;margin-top:13px;
+  color:#ddd;text-decoration:underline;
+  font-weight:bold;cursor:pointer;
+}
+
+.details-extra{
+  display:none;
+  padding:12px 20px 18px;
+  color:#ddd;font-size:14px;
+  line-height:1.6;
+  border-top:1px solid #444;
+}
+
+.change-plan{
+  float:right;
+  padding:10px 13px;border:0;
+  border-radius:12px;background:#422d60;
+  color:#e8d4ff;font-weight:bold;
+}
+
+.history-modal{
+  display:none;position:fixed;inset:0;
+  z-index:10;background:#000b;
+  justify-content:center;align-items:center;
+  padding:18px;
+}
+
+.history-content{
+  width:100%;max-width:400px;
+  background:white;color:#222;
+  border-radius:18px;padding:22px;
+}
+
+.history-content h2{margin-bottom:15px}
+.history-content p{color:#666;line-height:1.6}
+.close-btn{
+  width:100%;padding:12px;margin-top:20px;
+  border:0;border-radius:10px;
+  background:#6546dc;color:white;font-weight:bold;
+}
+
+@media(max-width:400px){
+  body{padding:15px 10px}
+  .profile h2{font-size:18px}
+  .operator{width:72px;height:72px;font-size:20px}
+  .operator-area{gap:18px}
+  .recharge-btn{width:80%;font-size:21px}
+  .balance{padding:20px 15px}
+  .history-btn{font-size:15px;padding:10px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="profile">
+    <div class="avatar" id="avatar">BM</div>
+    <div class="profile-info">
+      <h2 id="userName">Mr. Balaram Maity</h2>
+      <p>User ID: <span id="userId">927474001</span></p>
+    </div>
+  </div>
+
+  <div class="balance">
+    <div>
+      <p class="balance-title">Available Balance</p>
+      <div class="balance-amount">₹17,340.00</div>
+    </div>
+    <button class="history-btn" onclick="openHistory()">History</button>
+  </div>
+
+  <div class="operator-area">
+    <button class="operator airtel" data-operator="Airtel"
+      onclick="selectOperator('Airtel')">A</button>
+    <button class="operator vi" data-operator="Vi"
+      onclick="selectOperator('Vi')">Vi</button>
+    <button class="operator jio" data-operator="Jio"
+      onclick="selectOperator('Jio')">Jio</button>
+  </div>
+
+  <input
+    class="input-box"
+    id="mobile"
+    type="tel"
+    inputmode="numeric"
+    maxlength="10"
+    placeholder="Enter mobile number"
+  >
+
+  <input
+    class="input-box amount-box"
+    id="amount"
+    type="number"
+    min="1"
+    placeholder="Amount"
+  >
+
+  <button class="recharge-btn" onclick="rechargeNow()">
+    Recharge Now
+  </button>
+
+  <div class="details-box">
+    <div class="details-heading">Recharge Details</div>
+    <div id="details">
+      <div class="empty-message">
+        Select an operator and enter an amount.<br>
+        Your matching plan details will appear here.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="history-modal" id="historyModal">
+  <div class="history-content">
+    <h2>Recharge History</h2>
+    <p id="historyText">No recharge attempts yet.</p>
+    <button class="close-btn" onclick="closeHistory()">Close</button>
+  </div>
+</div>
+
+<script>
+/* PROFILE */
+const savedName = localStorage.getItem("profileName");
+const savedPhoto = localStorage.getItem("profilePhoto");
+
+if(savedName){
+  document.getElementById("userName").textContent = savedName;
+}
+if(savedPhoto){
+  document.getElementById("avatar").innerHTML =
+    '<img src="' + savedPhoto + '" alt="Profile">';
+}
+
+/* PLAN DATA FROM YOUR SCREENSHOTS */
+const plans = [
+  {
+    operator:"Jio",
+    amount:349,
+    validity:"28 Days",
+    data:"Unlimited 5G + 2GB/day",
+    description:"Jio Special benefits: True 5G Unlimited Plan + JioHotstar Mobile + Canva Pro Lite...",
+    icons:"✨ ▶️ ☁️ +1",
+    extra:"Calls: Unlimited | SMS: As per plan. Jio special benefits are shown as plan information."
+  },
+  {
+    operator:"Jio",
+    amount:29,
+    validity:"2 Days",
+    data:"2 GB",
+    description:"Data Only Pack (No Voice & No SMS). Voice: NA | SMS: NA...",
+    icons:"",
+    extra:"Data: 2 GB. This is a data-only pack. No voice or SMS benefits."
+  },
+  {
+    operator:"Jio",
+    amount:200,
+    validity:"28 Days",
+    data:"Unlimited 5G + 30 GB",
+    description:"Jio OTT Pass (No Calls & No SMS) - 15 OTT apps + 1000 TV channels ...",
+    icons:"📺 ▶️ 📦 🎬 ✨ +4",
+    extra:"Jio OTT Pass. No Calls & No SMS. Includes the benefits described in the sample plan."
+  },
+  {
+    operator:"Vi",
+    amount:26,
+    validity:"1 Day",
+    data:"1.5 GB",
+    description:"ADD-ON Data pack - 1.5 GB for 1 Day (Expires at 11:59 PM). NO Service Validity. No Outgoing SMS.",
+    icons:"",
+    extra:"Data: 1.5 GB. Valid for 1 day. No service validity. No outgoing SMS."
+  },
+  {
+    operator:"Vi",
+    amount:349,
+    validity:"28 Days",
+    data:"1.5 GB/Day",
+    description:"Create a Prepaid Family on Vi App & Share DATA at No Extra Cost. Download Now! ...",
+    icons:"◷ 🔴 ① 🎁 5G",
+    extra:"Validity: 28 Days. Data: 1.5 GB per day. Family sharing information is shown as sample text."
+  },
+  {
+    operator:"Airtel",
+    amount:349,
+    validity:"28 Days",
+    data:"1.5 GB/day",
+    description:"Calls: Unlimited. Data: 1.5 GB/day...",
+    icons:"🛡️ 🎵",
+    extra:"Calls: Unlimited. Data: 1.5 GB per day. Validity: 28 days."
+  },
+  {
+    operator:"Airtel",
+    amount:349,
+    validity:"28 Days",
+    data:"Unlimited 5G + 2.0 GB/day",
+    description:"Calls: Unlimited. Data: Unlimited 5G + 2GB/day...",
+    icons:"5G 🛡️ 🎵",
+    extra:"Calls: Unlimited. Data: Unlimited 5G + 2 GB per day. Validity: 28 days."
+  },
+  {
+    operator:"Airtel",
+    amount:22,
+    validity:"1 Day",
+    data:"1.0 GB/pack",
+    description:"Data: 1GB. Details: 1GB data valid for the same day till midnight",
+    icons:"",
+    extra:"Data: 1 GB. Valid for the same day till midnight."
+  }
+];
+
+let selectedOperator = "";
+let currentPlan = null;
+let RechargeHistory = [];
+
+/* OPERATOR SELECTION */
+function selectOperator(operator){
+  selectedOperator = operator;
+
+  document.querySelectorAll(".operator").forEach(button=>{
+    button.classList.toggle(
+      "active",
+      button.dataset.operator === operator
+    );
+  });
+
+  showPlan();
+}
+
+/* AMOUNT INPUT */
+document.getElementById("amount").addEventListener("input",showPlan);
+
+/* SHOW MATCHING PLAN */
+function showPlan(){
+  const amount = Number(document.getElementById("amount").value);
+  const details = document.getElementById("details");
+
+  currentPlan = null;
+
+  if(!selectedOperator){
+    details.innerHTML =
+      '<div class="empty-message">Please select Airtel, Vi or Jio first.</div>';
+    return;
+  }
+
+  if(!amount){
+    details.innerHTML =
+      '<div class="empty-message">Now enter an amount to see the matching plan.</div>';
+    return;
+  }
+
+  const plan = plans.find(item =>
+    item.operator === selectedOperator &&
+    item.amount === amount
+  );
+
+  if(!plan){
+    details.innerHTML =
+      '<div class="empty-message">Plan Not Found<br>No matching plan for ' +
+      selectedOperator + ' ₹' + amount +
+      '. Please check the amount.</div>';
+    return;
+  }
+
+  currentPlan = plan;
+
+  details.innerHTML = `
+    <div class="plan-card">
+      <div class="plan-top">
+        <button class="change-plan" onclick="clearAmount()">Change Plan</button>
+        <div class="plan-price">₹${plan.amount}</div>
+        <div class="plan-meta">
+          <div>Validity<strong>${plan.validity}</strong></div>
+          <div>Data<strong>${plan.data}</strong></div>
+        </div>
+      </div>
+      <div class="plan-description">
+        ${plan.description}
+        ${plan.icons ? `<div class="plan-icons">${plan.icons}</div>` : ""}
+        <span class="plan-details" onclick="toggleExtra()">Details</span>
+      </div>
+      <div class="details-extra" id="extraDetails">
+        ${plan.extra}
+      </div>
+    </div>
+  `;
+}
+
+function toggleExtra(){
+  const extra = document.getElementById("extraDetails");
+  if(extra){
+    extra.style.display =
+      extra.style.display === "block" ? "none" : "block";
+  }
+}
+
+function clearAmount(){
+  document.getElementById("amount").value = "";
+  currentPlan = null;
+  showPlan();
+}
+
+/* RECHARGE */
+function rechargeNow(){
+  const mobile = document.getElementById("mobile").value.trim();
+
+  if(!selectedOperator){
+    alert("Please select an operator first.");
+    return;
+  }
+
+  if(!/^[0-9]{10}$/.test(mobile)){
+    alert("Please enter a valid 10-digit mobile number.");
+    return;
+  }
+
+  if(!currentPlan){
+    alert("Please enter an amount with a matching plan.");
+    return;
+  }
+
+  const record = {
+    operator:selectedOperator,
+    mobile:mobile,
+    amount:currentPlan.amount,
+    date:new Date().toLocaleString("en-IN")
+  };
+
+  History.unshift(record);
+
+  alert(
+    "only: Recharge details confirmed.\n\n" +
+    "Operator: " + record.operator + "\n" +
+    "Mobile: " + record.mobile + "\n" +
+    "Amount: ₹" + record.amount +
+    "\n\nNo real recharge or payment was made."
+  );
+}
+
+/* HISTORY */
+function openHistory(){
+  const text = document.getElementById("historyText");
+
+  if(History.length === 0){
+    text.textContent = "no recharge attempts yet.";
+  }else{
+    text.innerHTML = History.map(item =>
+      "<b>" + item.operator + "</b> • " +
+      item.mobile + " • ₹" + item.amount +
+      "<br><small>" + item.date + "</small><hr>"
+    ).join("<br>");
+  }
+
+  document.getElementById("historyModal").style.display = "flex";
+}
+
+function closeHistory(){
+  document.getElementById("historyModal").style.display = "none";
+}
+</script>
+
+</body>
+</html>
