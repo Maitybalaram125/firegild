@@ -1,0 +1,1011 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Internet Pay</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#eef2fb;color:#17264b;padding:14px}
+button{cursor:pointer}
+.container{max-width:850px;margin:auto}
+.profile{display:flex;align-items:center;gap:15px;padding:15px 5px 25px}
+.avatar,.ads-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#28d9e8,#17499f);border:4px solid white;display:flex;align-items:center;justify-content:center;color:white;font-size:25px;font-weight:bold;overflow:hidden;flex-shrink:0}
+.avatar img,.ads-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-info{flex:1;min-width:0}
+.profile-info h2{font-size:20px;margin-bottom:7px}
+.profile-info p{font-size:13px;color:#71809f}
+.edit-btn{margin-top:9px;background:#e9e1ff;color:#6733c6;border:0;padding:9px 14px;border-radius:10px;font-weight:bold}
+.balance{background:linear-gradient(120deg,#17499f,#6636c9 65%,#a33de0);padding:28px;border-radius:23px;color:white;min-height:170px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 10px 25px #5438a52c}
+.balance-title{font-size:16px;color:#e1e9ff;margin-bottom:12px}
+.balance-amount{font-size:clamp(30px,6vw,43px);font-weight:800;white-space:nowrap;color:white}
+.coin-area{width:90px;height:95px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gold-coin{width:75px;height:75px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6a0,#ffdf55 30%,#e9a900 70%,#a96c00);border:6px solid #ffdf55;box-shadow:0 0 0 3px #b77b09,inset 0 0 0 3px #fff1a0,0 8px 18px #0003;display:flex;align-items:center;justify-content:center;animation:spin 4s linear infinite}
+.gold-coin span{font-size:45px;font-weight:bold;color:#c17c00}
+@keyframes spin{to{transform:rotateY(360deg)}}
+.task-card,.payout-card{background:white;padding:22px;border-radius:20px;margin-top:25px;box-shadow:0 5px 18px #19376d0c}
+.task-title{font-size:20px;margin-bottom:20px}
+.progress-info{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;color:#71809f;margin-bottom:10px}
+.progress{height:11px;background:#e8eafa;border-radius:20px;overflow:hidden}
+.progress-fill{height:100%;width:50%;background:linear-gradient(90deg,#28d9e8,#7739df)}
+.buttons{display:flex;gap:13px;margin-top:22px}
+.action-btn{flex:1;padding:17px 8px;border:0;border-radius:16px;color:white;font-size:17px;font-weight:bold;min-height:75px}
+.watch{background:linear-gradient(120deg,#00a88c,#087bba)}
+.recharge{background:linear-gradient(120deg,#f0447c,#a33ee0)}
+.payout-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.payout-header h2{font-size:20px}
+.demo-label{background:#e4f8f1;color:#009e79;padding:7px 10px;border-radius:20px;font-size:11px;font-weight:bold}
+.updated-time{font-size:12px;color:#9aa4b8;margin-bottom:12px}
+.payout-list{display:flex;flex-direction:column;max-height:330px;overflow-y:auto}
+.payout-item{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid #edf0f7}
+.payout-avatar{width:43px;height:43px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:white;font-size:17px;font-weight:bold;flex-shrink:0}
+.payout-details{flex:1;min-width:0}
+.payout-details h3{font-size:14px;margin-bottom:5px}
+.payout-details p,.payout-status{font-size:11px;color:#98a1b4}
+.payout-status{color:#079b79;margin-top:4px}
+.payout-amount{color:#079b79;font-size:14px;font-weight:bold;white-space:nowrap}
+.note,.ads-demo-note{text-align:center;color:#929cb1;font-size:11px;margin:20px 0}
+
+/* ADS PAGE */
+#adsPage{display:none;min-height:100vh;background:linear-gradient(160deg,#10265b,#17499f 60%,#263b91);padding:20px 0 35px;color:white}
+.ads-container{max-width:850px;margin:auto;padding:0 15px}
+.back-btn{background:#ffffff18;color:white;border:1px solid #ffffff55;border-radius:11px;padding:11px 15px;font-size:14px;font-weight:bold;margin-bottom:10px}
+.ads-top{display:flex;align-items:center;gap:15px;margin:18px 0 30px}
+.ads-avatar{background:#00d9e9;border-color:#27ddec;box-shadow:0 0 18px #00d9e877}
+.ads-user-info h2{font-size:21px;margin-bottom:7px}
+.ads-user-info p{font-size:13px;color:#d2e2ff}
+.ads-balance{background:linear-gradient(115deg,#ed438c,#833be0 75%,#5545e9);border-radius:22px;padding:23px 20px;min-height:145px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 9px 25px #0003;border:1px solid #ffffff35}
+.ads-balance-title{font-size:15px;color:#fce8f5;margin-bottom:10px}
+.ads-balance-amount{font-size:clamp(28px,6vw,40px);font-weight:800;white-space:nowrap}
+.ads-recharge{background:linear-gradient(120deg,#00b89b,#087bb9);color:white;border:1px solid #ffffff90;border-radius:13px;padding:12px 14px;font-size:15px;font-weight:bold}
+
+/* ONE BIG AD BOX */
+.advertisement-box{background:#ffffff12;border:1px solid #ffffff35;border-radius:22px;padding:17px;margin-top:28px;box-shadow:0 10px 30px #0002}
+.advertisement-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+.advertisement-header h2{font-size:19px;margin-bottom:6px}
+.advertisement-header p{color:#c7d9ff;font-size:12px}
+.refresh-btn{border:1px solid #ffffff55;border-radius:12px;background:linear-gradient(120deg,#00b89b,#087bb9);color:white;padding:11px 13px;font-size:14px;font-weight:bold;white-space:nowrap}
+.refresh-btn:disabled{opacity:.6}
+.ad-list{display:flex;flex-direction:column;gap:13px}
+.ad-card{background:white;color:#17264b;border-radius:15px;min-height:90px;padding:12px;display:flex;align-items:center;gap:10px;box-shadow:0 5px 14px #0002;animation:adAppear .3s ease}
+@keyframes adAppear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ad-logo{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:bold;flex-shrink:0}
+.ad-name{flex:1;min-width:0;font-size:14px;font-weight:bold}
+.ad-type{font-size:11px;color:#8290a8;margin-top:5px}
+.ad-watch{min-width:103px;border:0;border-radius:11px;padding:10px 6px;color:white;background:linear-gradient(110deg,#ed438c,#793de2);font-size:13px;font-weight:bold}
+.ad-watch strong,.ad-watch span{display:block}
+.ad-watch span{font-size:11px;margin-top:5px;font-weight:normal}
+.ad-watch:disabled{opacity:.5;cursor:not-allowed}
+.ad-refresh-note{text-align:center;color:#c7d9ff;font-size:11px;margin-top:16px}
+
+/* RECHARGE PAGE */
+#rechargePage{display:none;min-height:100vh;background:linear-gradient(145deg,#5548f4,#397fc6,#13a99e);padding:18px 0 35px;color:white}
+.recharge-container{max-width:650px;margin:auto;padding:0 13px}
+.recharge-balance{background:linear-gradient(110deg,#ed3980,#8338f4);padding:23px 17px;border-radius:22px;border:2px solid white;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.recharge-balance-title{font-size:17px;margin-bottom:8px}
+.recharge-balance-amount{font-size:clamp(26px,7vw,39px);font-weight:bold}
+.history-btn{border:0;border-radius:9px;padding:10px 14px;color:white;background:#3985c9;font-size:15px}
+.operator-area{display:flex;justify-content:center;gap:25px;margin:28px 0;align-items:flex-start}
+.operator-wrap{display:flex;flex-direction:column;align-items:center;gap:9px}
+.operator{width:78px;height:78px;border-radius:50%;border:3px solid white;background:white;display:flex;align-items:center;justify-content:center;transition:.2s;padding:8px}
+.operator.active{box-shadow:0 0 0 4px #00eaff,0 0 22px #00ffff;transform:scale(1.08)}
+.operator-name{font-size:12px;font-weight:bold;color:white}
+.airtel-brand{display:flex;flex-direction:column;align-items:center}
+.airtel-symbol{width:26px;height:26px;border:6px solid #e60012;border-top-color:transparent;border-right-color:transparent;border-radius:50%;transform:rotate(-35deg)}
+.airtel-logo{color:#e60012;font-size:22px;font-weight:900;font-style:italic}
+.vi-logo{font-size:31px;font-weight:900;letter-spacing:-3px;background:linear-gradient(110deg,#ed1c78,#5c2d91);-webkit-background-clip:text;color:transparent}
+.jio-logo{width:54px;height:54px;border-radius:50%;background:#0866d9;color:white;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900}
+.input-box{display:block;width:90%;max-width:450px;margin:15px auto;padding:15px 12px;border:2px solid #ddd;border-radius:13px;background:white;color:#222;text-align:center;font-size:19px;outline:none}
+.input-box:focus{border-color:#00dce8}
+.amount-box{max-width:280px}
+.recharge-now{display:block;width:75%;max-width:340px;margin:30px auto;padding:18px 10px;border:3px solid #00eaff;border-radius:17px;background:linear-gradient(120deg,#00e5e5,#00b9c8);color:#071b25;font-size:21px;font-weight:bold}
+.recharge-now:disabled{opacity:.65}
+.details-box{min-height:220px;padding:18px;border:2px solid #657eb6;border-radius:12px;background:#ffffff35;color:white}
+.details-heading{font-size:20px;font-weight:bold;margin-bottom:14px}
+.empty-message{text-align:center;padding:50px 8px;color:#f2f2f2;font-size:15px;line-height:1.6}
+.plan-card{background:#191919;border:1px solid #444;border-radius:15px;overflow:hidden;margin-bottom:12px;color:#eee}
+.plan-top{padding:18px}
+.plan-price{font-size:32px;font-weight:bold;margin-bottom:15px}
+.plan-meta{display:flex;gap:25px;color:#bbb;font-size:14px}
+.plan-meta strong{display:block;color:#eee;font-size:16px;margin-top:5px}
+.plan-description{border-top:2px solid #444;padding:15px;color:#bbb;font-size:14px;line-height:1.5}
+.plan-details{display:inline-block;margin-top:12px;color:#ddd;text-decoration:underline;font-weight:bold;cursor:pointer}
+.details-extra{display:none;padding:12px 15px 17px;color:#ddd;font-size:13px;line-height:1.6;border-top:1px solid #444}
+.change-plan{float:right;padding:9px 12px;border:0;border-radius:10px;background:#422d60;color:#e8d4ff;font-weight:bold}
+.history-modal,.modal{display:none;position:fixed;inset:0;z-index:1000;background:#000b;justify-content:center;align-items:center;padding:17px}
+.history-content,.modal-box{width:100%;max-width:390px;background:white;color:#222;border-radius:18px;padding:22px}
+.history-content h2,.modal-box h2{text-align:center;margin-bottom:18px}
+.history-content p{color:#555;line-height:1.6;margin:10px 0}
+.close-btn,.save-btn,.close-profile-btn{width:100%;padding:13px;border:0;border-radius:11px;font-weight:bold;margin-top:10px}
+.close-btn,.save-btn{background:#6546dc;color:white}
+.close-profile-btn{background:#edf0f7;color:#333}
+.preview{width:100px;height:100px;border-radius:50%;background:#00ced1;margin:0 auto 15px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:white;font-size:30px;font-weight:bold}
+.preview img{width:100%;height:100%;object-fit:cover}
+.upload-label{display:block;text-align:center;background:#eee8ff;color:#7137ce;padding:12px;border-radius:10px;margin-bottom:15px;cursor:pointer;font-weight:bold}
+.modal-box input[type=file]{display:none}
+.modal-box input[type=text]{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:10px 0 15px;font-size:15px}
+.status-modal{display:none;position:fixed;inset:0;z-index:3000;background:#000b;justify-content:center;align-items:center;padding:18px}
+.status-box{width:100%;max-width:370px;background:white;border-radius:22px;padding:27px 20px;text-align:center;color:#17264b}
+.loader-ring{width:70px;height:70px;border:7px solid #e7eafa;border-top-color:#6546dc;border-right-color:#16b8d0;border-radius:50%;margin:5px auto 20px;animation:loaderSpin .8s linear infinite}
+@keyframes loaderSpin{to{transform:rotate(360deg)}}
+.success-icon{width:78px;height:78px;margin:0 auto 17px;border-radius:50%;background:#e2f9ed;color:#0ba66a;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:bold}
+.success-title{font-size:24px;color:#079b66;font-weight:800;margin-bottom:9px}
+.success-subtitle{font-size:13px;color:#8993a7;margin-bottom:18px}
+.success-details{background:#f5f7fc;border-radius:13px;padding:13px;text-align:left;margin-bottom:15px}
+.success-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #e5e9f2;font-size:13px}
+.success-row:last-child{border:0}
+.success-row span:first-child{color:#8490a6}
+.success-row strong{text-align:right;overflow-wrap:anywhere}
+.done-btn{width:100%;padding:14px;border:0;border-radius:12px;background:linear-gradient(110deg,#0ab878,#079b83);color:white;font-size:16px;font-weight:bold}
+
+/* AD VIDEO MODAL */
+.video-modal{display:none;position:fixed;inset:0;z-index:5000;background:#030819ed;justify-content:center;align-items:center;padding:13px}
+.video-box{width:100%;max-width:480px;background:white;border-radius:19px;overflow:hidden;color:#17264b}
+.video-header{background:linear-gradient(110deg,#10265b,#6636c9);color:white;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}
+.video-header h2{font-size:18px}
+.ad-tag{font-size:10px;background:#ffffff25;padding:6px 9px;border-radius:20px}
+.video-screen{position:relative;background:#080d1c;width:100%;aspect-ratio:16/9;overflow:hidden}
+.video-screen canvas{width:100%;height:100%;display:block}
+.video-overlay-label{position:absolute;left:10px;top:10px;background:#0009;color:white;font-size:10px;padding:6px 8px;border-radius:6px}
+.video-timer{position:absolute;right:10px;top:10px;background:#000b;color:white;font-size:13px;font-weight:bold;padding:7px 9px;border-radius:8px}
+.video-info{padding:17px;text-align:center}
+.video-info h3{font-size:19px;margin-bottom:7px}
+.video-info p{font-size:12px;color:#8290a8;line-height:1.5}
+.video-progress{height:8px;background:#e8eafa;border-radius:20px;overflow:hidden;margin:15px 0 9px}
+.video-progress-fill{height:100%;width:0;background:linear-gradient(90deg,#00b89b,#7739df);transition:width .3s}
+.video-status{font-size:12px;color:#6d7b94}
+.reward-screen,.claimed-screen{display:none;padding:27px 20px;text-align:center}
+.reward-star{font-size:50px;margin-bottom:10px}
+.reward-title{font-size:25px;color:#079b66;font-weight:900;margin-bottom:9px}
+.reward-text{color:#78849a;font-size:13px;line-height:1.5}
+.reward-amount{font-size:38px;font-weight:900;color:#079b79;margin:17px 0}
+.claim-btn{width:100%;padding:15px;border:0;border-radius:12px;background:linear-gradient(110deg,#00b878,#087bba);color:white;font-size:17px;font-weight:bold}
+.claim-btn:disabled{opacity:.6}
+.claim-note{font-size:11px;color:#98a1b4;margin-top:12px}
+.claimed-screen h2{font-size:24px;color:#079b66;margin-bottom:12px}
+.claimed-screen p{color:#78849a;line-height:1.6;font-size:13px;margin-bottom:17px}
+.claimed-balance{font-size:24px;font-weight:900;color:#17499f;margin-bottom:18px}
+.video-close-btn{width:100%;padding:14px;border:0;border-radius:12px;background:#17499f;color:white;font-weight:bold;font-size:15px}
+
+@media(max-width:420px){
+body{padding:10px}
+.balance{padding:22px 15px;min-height:145px}
+.gold-coin{width:65px;height:65px}
+.gold-coin span{font-size:38px}
+.task-card,.payout-card{padding:17px}
+.action-btn{font-size:15px}
+.ads-container{padding:0 11px}
+.ads-balance{padding:19px 13px}
+.ads-recharge{font-size:13px;padding:10px}
+.advertisement-box{padding:12px}
+.advertisement-header h2{font-size:16px}
+.refresh-btn{font-size:12px;padding:10px}
+.ad-card{gap:8px;padding:9px}
+.ad-logo{width:44px;height:44px;font-size:15px}
+.ad-name{font-size:12px}
+.ad-watch{min-width:88px;font-size:11px;padding:9px 4px}
+.ad-watch span{font-size:10px}
+.operator-area{gap:17px}
+.operator{width:70px;height:70px}
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="container" id="homePage">
+  <div class="profile">
+    <div class="avatar" id="mainAvatar">BM</div>
+    <div class="profile-info">
+      <h2 id="userName">Mr. Balaram Maity</h2>
+      <p>User ID: 00688476811</p>
+      <button class="edit-btn" onclick="openEditor()">✏ Edit Profile</button>
+    </div>
+  </div>
+
+  <div class="balance">
+    <div>
+      <p class="balance-title">Available Balance</p>
+      <h1 class="balance-amount" id="homeBalance">₹00.00</h1>
+    </div>
+    <div class="coin-area"><div class="gold-coin"><span>₹</span></div></div>
+  </div>
+
+  <div class="task-card">
+    <h2 class="task-title">Daily Tasks</h2>
+    <div class="progress-info"><span>YOUR DAILY PROGRESS</span><span>47%</span></div>
+    <div class="progress"><div class="progress-fill"></div></div>
+  </div>
+
+  <div class="buttons">
+    <button class="action-btn watch" onclick="openAdsPage()">▶ Watching Ads</button>
+    <button class="action-btn recharge" onclick="openRechargePage()">＋ Recharge</button>
+  </div>
+
+  <div class="payout-card">
+    <div class="payout-header"><h2>Recent Recharge</h2><span class="Cash-label">● Cash₹</span></div>
+    <p class="updated-time" id="updatedTime"></p>
+    <div class="payout-list" id="payoutList"></div>
+  </div>
+  <p class="note">Real Time Dashboard • Recharge successfully.</p>
+</div>
+
+<!-- ADS PAGE -->
+<div id="adsPage">
+  <div class="ads-container">
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+    <div class="ads-top">
+      <div class="ads-avatar" id="adsAvatar">BM</div>
+      <div class="ads-user-info">
+        <h2 id="adsUserName">Mr. Balaram Maity</h2>
+        <p>User ID: 4884030O001</p>
+      </div>
+    </div>
+
+    <div class="ads-balance">
+      <div>
+        <p class="ads-balance-title">Available Balance</p>
+        <h1 class="ads-balance-amount" id="adsBalance">₹17,340.00</h1>
+      </div>
+      <button class="ads-recharge" onclick="openRechargePage()">＋ Recharge</button>
+    </div>
+
+    <div class="advertisement-box">
+      <div class="advertisement-header">
+        <div>
+          <h2>Available Advertisements</h2>
+          <p id="adCount">Showing 4 advertisements</p>
+        </div>
+        <button class="refresh-btn" id="refreshAdsBtn" onclick="refreshAds()">↻ Refresh</button>
+      </div>
+      <div class="ad-list" id="adList"></div>
+      <p class="ad-refresh-note">Refresh to discover new advertisements</p>
+    </div>
+    <p class="ads-demo-note">Advertisement Page • Company Ads and rewards only.</p>
+  </div>
+</div>
+
+<!-- RECHARGE PAGE -->
+<div id="rechargePage">
+  <div class="recharge-container">
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+    <div class="profile">
+      <div class="avatar" id="rechargeAvatar">BM</div>
+      <div class="profile-info">
+        <h2 id="rechargeUserName">Mr. Balaram Maity</h2>
+        <p>User ID: 849292001</p>
+      </div>
+    </div>
+
+    <div class="recharge-balance">
+      <div>
+        <p class="recharge-balance-title">Available Balance</p>
+        <h1 class="recharge-balance-amount" id="rechargeBalance">₹17,340.00</h1>
+      </div>
+      <button class="history-btn" onclick="openHistory()">History</button>
+    </div>
+
+    <div class="operator-area">
+      <div class="operator-wrap">
+        <button class="operator" data-operator="Airtel" onclick="selectOperator('Airtel')">
+          <div class="airtel-brand"><div class="airtel-symbol"></div><span class="airtel-logo">airtel</span></div>
+        </button>
+        <span class="operator-name">Airtel</span>
+      </div>
+      <div class="operator-wrap">
+        <button class="operator" data-operator="Vi" onclick="selectOperator('Vi')"><span class="vi-logo">Vi</span></button>
+        <span class="operator-name">Vodafone Idea</span>
+      </div>
+      <div class="operator-wrap">
+        <button class="operator" data-operator="Jio" onclick="selectOperator('Jio')"><span class="jio-logo">Jio</span></button>
+        <span class="operator-name">Jio</span>
+      </div>
+    </div>
+
+    <input class="input-box" id="mobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number">
+    <input class="input-box amount-box" id="amount" type="number" min="1" placeholder="Amount">
+    <button class="recharge-now" id="rechargeButton" onclick="rechargeNow()">Recharge Now</button>
+
+    <div class="details-box">
+      <div class="details-heading">Recharge Details</div>
+      <div id="details"><div class="empty-message">Select an operator and enter an amount. Your matching plan details will appear here.</div></div>
+    </div>
+    <p class="ads-demo-note">Recharge System • real recharge or payment.</p>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <h2>Edit Profile</h2>
+    <div class="preview" id="preview">BM</div>
+    <label class="upload-label" for="photoInput">📷 Upload Profile Photo</label>
+    <input type="file" id="photoInput" accept="image/*">
+    <label>Full Name</label>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+    <button class="close-profile-btn" onclick="closeEditor()">Cancel</button>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="history-modal" id="historyModal">
+  <div class="history-content">
+    <h2>Recharge History</h2>
+    <div id="historyText"><p>No recharge attempts yet.</p></div>
+    <button class="close-btn" onclick="closeHistory()">Close</button>
+  </div>
+</div>
+
+<!-- LOADING MODAL -->
+<div class="status-modal" id="loadingModal">
+  <div class="status-box">
+    <div class="loader-ring"></div>
+    <h2>Processing Recharge...</h2>
+    <p style="color:#8290a8;margin-top:10px">Please wait while we process your request.</p>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="status-modal" id="successModal">
+  <div class="status-box">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">Recharge Successful!</h2>
+    <p class="success-subtitle">Your recharge request has been completed.</p>
+    <div class="success-details">
+      <div class="success-row"><span>Operator</span><strong id="successOperator">Jio</strong></div>
+      <div class="success-row"><span>Mobile Number</span><strong id="successMobile">0000000000</strong></div>
+      <div class="success-row"><span>Amount</span><strong id="successAmount">₹349</strong></div>
+      <div class="success-row"><span>Date & Time</span><strong id="successDate">--</strong></div>
+    </div>
+    <p style="font-size:11px;color:#8c97aa;margin-bottom:15px">Transaction ID: <strong id="successTxn"></strong></p>
+    <button class="done-btn" onclick="closeSuccess()">Done</button>
+  </div>
+</div>
+
+<!-- AD VIDEO MODAL -->
+<div class="video-modal" id="videoModal">
+  <div class="video-box">
+    <div class="video-header">
+      <h2>Advertisement</h2>
+      <span class="ad-tag">international ads centre VIDEO AD</span>
+    </div>
+
+    <div id="videoPlayingScreen">
+      <div class="video-screen">
+        <canvas id="adCanvas" width="800" height="450"></canvas>
+        <span class="video-overlay-label">Real World ADVERTISEMENT</span>
+        <span class="video-timer" id="videoTimer">00:05</span>
+      </div>
+      <div class="video-info">
+        <h3 id="videoAdName">Advertisement</h3>
+        <p>Watch the Full Ads until the timer finishes to unlock the reward.</p>
+        <div class="video-progress"><div class="video-progress-fill" id="videoProgress"></div></div>
+        <div class="video-status" id="videoStatus">Advertisement is playing...</div>
+      </div>
+    </div>
+
+    <div class="reward-screen" id="rewardScreen">
+      <div class="reward-star">🎉</div>
+      <h2 class="reward-title">Congratulations!</h2>
+      <p class="reward-text">You have completed the Real World advertisement.</p>
+      <div class="reward-amount" id="rewardAmount">₹23.00</div>
+      <p class="reward-text">Your reward is ready to claim.</p>
+      <button class="claim-btn" id="claimButton" onclick="claimAdReward()">Claim Reward</button>
+      <p class="claim-note">This is a Real reward, real money.</p>
+    </div>
+
+    <div class="claimed-screen" id="claimedScreen">
+      <div class="success-icon">✓</div>
+      <h2>Reward Claimed!</h2>
+      <p>Your reward has been added to your Available Balance.</p>
+      <div class="claimed-balance" id="claimedBalance">₹17,363.00</div>
+      <button class="video-close-btn" onclick="closeAdPopup()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* BALANCE */
+const STARTING_BALANCE=17340;
+const BALANCE_KEY="demoAvailableBalance";
+
+function readSavedBalance(){
+  try{
+    const saved=localStorage.getItem(BALANCE_KEY);
+    if(saved===null){
+      localStorage.setItem(BALANCE_KEY,String(STARTING_BALANCE));
+      return STARTING_BALANCE;
+    }
+    const n=Number(saved);
+    return Number.isFinite(n)&&n>=0?n:STARTING_BALANCE;
+  }catch(e){return STARTING_BALANCE}
+}
+
+let availableBalance=readSavedBalance();
+
+function formatBalance(){
+  return "₹"+availableBalance.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function saveBalance(){
+  try{localStorage.setItem(BALANCE_KEY,String(availableBalance))}catch(e){}
+}
+function updateBalanceDisplays(){
+  ["homeBalance","adsBalance","rechargeBalance"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=formatBalance();
+  });
+}
+
+/* PAGE NAVIGATION */
+function hideAllPages(){
+  document.getElementById("homePage").style.display="none";
+  document.getElementById("adsPage").style.display="none";
+  document.getElementById("rechargePage").style.display="none";
+}
+function goHome(){
+  hideAllPages();
+  document.getElementById("homePage").style.display="block";
+  updateBalanceDisplays();
+  window.scrollTo(0,0);
+}
+function openAdsPage(){
+  hideAllPages();
+  document.getElementById("adsPage").style.display="block";
+  updateProfilePages();
+  updateBalanceDisplays();
+  refreshAds();
+  window.scrollTo(0,0);
+}
+function openRechargePage(){
+  hideAllPages();
+  document.getElementById("rechargePage").style.display="block";
+  updateProfilePages();
+  updateBalanceDisplays();
+  window.scrollTo(0,0);
+}
+
+/* AD DATA */
+const adDurations=[5,15,30];
+const adTemplates=[
+  {name:"Smart Shopping",type:"shopping",color:"#ed438c",reward:12},
+  {name:"Travel World",type:"travel",color:"#087bb9",reward:18},
+  {name:"Tech Zone",type:"tech",color:"#6636c9",reward:9},
+  {name:"Food Festival",type:"food",color:"#e87932",reward:15},
+  {name:"Fashion Hub",type:"fashion",color:"#c0398c",reward:21},
+  {name:"Education Plus",type:"education",color:"#168d78",reward:11},
+  {name:"Digital Store",type:"digital",color:"#3455bd",reward:17},
+  {name:"Home Decor",type:"home",color:"#9a6b34",reward:14},
+  {name:"Fitness World",type:"fitness",color:"#168b9d",reward:19},
+  {name:"Creative Studio",type:"creative",color:"#8738c7",reward:10},
+  {name:"Mobile Zone",type:"mobile",color:"#2875a8",reward:16},
+  {name:"Nature Life",type:"nature",color:"#31975c",reward:13}
+];
+
+let adCounter=0;
+let adRefreshNumber=0;
+let adTimer=null;
+let adSecondsLeft=0;
+let activeAdReward=0;
+let activeAd=null;
+let adCompleted=false;
+let adClaimed=false;
+let animationFrame=null;
+let animationStart=0;
+
+function randomItem(array){
+  return array[Math.floor(Math.random()*array.length)];
+}
+
+/* REFRESH: SHOW FOUR NEW ADS */
+function refreshAds(){
+  if(adTimer!==null){
+    alert("Please finish the current advertisement first.");
+    return;
+  }
+
+  const list=document.getElementById("adList");
+  const count=document.getElementById("adCount");
+  const button=document.getElementById("refreshAdsBtn");
+  if(!list||!button)return;
+
+  button.disabled=true;
+  button.textContent="↻ Loading...";
+  list.innerHTML='<div style="text-align:center;padding:28px;color:white">Loading new advertisements...</div>';
+
+  setTimeout(function(){
+    list.innerHTML="";
+
+    const shuffled=[...adTemplates].sort(()=>Math.random()-0.5);
+    const selected=shuffled.slice(0,4);
+
+    selected.forEach(function(template){
+      const duration=randomItem(adDurations);
+      const reward=template.reward+Math.floor(Math.random()*5);
+      const ad={
+        id:"demo-ad-"+Date.now()+"-"+(++adCounter),
+        name:template.name,
+        type:template.type,
+        color:template.color,
+        duration:duration,
+        reward:reward
+      };
+
+      const card=document.createElement("div");
+      card.className="ad-card";
+
+      const logo=document.createElement("div");
+      logo.className="ad-logo";
+      logo.style.background=template.color;
+      logo.textContent=template.name.substring(0,2).toUpperCase();
+
+      const info=document.createElement("div");
+      info.className="ad-name";
+      info.textContent=template.name+" Ads";
+
+      const small=document.createElement("div");
+      small.className="ad-type";
+      small.textContent="International ads centre • "+duration+" Seconds";
+      info.appendChild(small);
+
+      const watch=document.createElement("button");
+      watch.className="ad-watch";
+      watch.innerHTML="<strong>Watch Now</strong><span>Reward ₹"+reward+"</span>";
+      watch.addEventListener("click",()=>watchAd(ad));
+
+      card.append(logo,info,watch);
+      list.appendChild(card);
+    });
+
+    adRefreshNumber++;
+    count.textContent="Showing 4 advertisements • Refresh #"+adRefreshNumber;
+    button.disabled=false;
+    button.textContent="↻ Refresh";
+  },500);
+}
+
+/* PLAY DEMO AD */
+function watchAd(ad){
+  if(adTimer!==null){
+    alert("An advertisement is already running.");
+    return;
+  }
+
+  activeAd=ad;
+  activeAdReward=ad.reward;
+  adCompleted=false;
+  adClaimed=false;
+  adSecondsLeft=ad.duration;
+
+  document.getElementById("videoAdName").textContent=ad.name+" Ads";
+  document.getElementById("videoTimer").textContent="00:"+String(ad.duration).padStart(2,"0");
+  document.getElementById("videoProgress").style.width="0%";
+  document.getElementById("videoStatus").textContent="Advertisement is playing...";
+  document.getElementById("videoPlayingScreen").style.display="block";
+  document.getElementById("rewardScreen").style.display="none";
+  document.getElementById("claimedScreen").style.display="none";
+  document.getElementById("videoModal").style.display="flex";
+  document.getElementById("claimButton").disabled=false;
+
+  document.querySelectorAll(".ad-watch").forEach(btn=>btn.disabled=true);
+
+  startDemoAnimation(ad);
+  updateAdTimer(ad.duration);
+
+  adTimer=setInterval(function(){
+    adSecondsLeft--;
+    if(adSecondsLeft<=0){
+      adSecondsLeft=0;
+      clearInterval(adTimer);
+      adTimer=null;
+      finishAd();
+      return;
+    }
+    updateAdTimer(ad.duration);
+  },1000);
+}
+
+function updateAdTimer(total){
+  document.getElementById("videoTimer").textContent="00:"+String(adSecondsLeft).padStart(2,"0");
+  document.getElementById("videoProgress").style.width=((total-adSecondsLeft)/total*100)+"%";
+}
+
+/* ANIMATED DEMO SCENES */
+function startDemoAnimation(ad){
+  stopDemoAnimation();
+  const canvas=document.getElementById("adCanvas");
+  const ctx=canvas.getContext("2d");
+  animationStart=performance.now();
+
+  const symbols={
+    shopping:"S",travel:"✈",tech:"T",food:"F",
+    fashion:"✦",education:"A+",digital:"D",home:"H",
+    fitness:"FIT",creative:"C",mobile:"M",nature:"N"
+  };
+
+  const particles=Array.from({length:35},()=>({
+    x:Math.random()*800,
+    y:Math.random()*450,
+    size:Math.random()*5+2,
+    speed:Math.random()*2+0.5
+  }));
+
+  function draw(now){
+    const elapsed=(now-animationStart)/1000;
+    ctx.fillStyle="#080d1c";
+    ctx.fillRect(0,0,800,450);
+
+    const gradient=ctx.createLinearGradient(0,0,800,450);
+    gradient.addColorStop(0,ad.color);
+    gradient.addColorStop(1,"#101b48");
+    ctx.fillStyle=gradient;
+    ctx.fillRect(0,0,800,450);
+
+    particles.forEach(p=>{
+      p.y-=p.speed;
+      if(p.y<0){p.y=450;p.x=Math.random()*800}
+      ctx.globalAlpha=.45;
+      ctx.fillStyle="white";
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fill();
+    });
+
+    ctx.globalAlpha=1;
+    const pulse=1+Math.sin(elapsed*3)*.08;
+    ctx.save();
+    ctx.translate(400,190);
+    ctx.scale(pulse,pulse);
+    ctx.fillStyle="white";
+    ctx.beginPath();
+    ctx.arc(0,0,75,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle=ad.color;
+    ctx.font="bold 48px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(symbols[ad.type]||"★",0,0);
+    ctx.restore();
+
+    ctx.textAlign="center";
+    ctx.fillStyle="white";
+    ctx.font="bold 38px Arial";
+    ctx.fillText(ad.name,400,325);
+    ctx.font="20px Arial";
+    ctx.fillStyle="#e5eaff";
+    ctx.fillText("Discover Something New",400,365);
+
+    if(document.getElementById("videoModal").style.display==="flex"){
+      animationFrame=requestAnimationFrame(draw);
+    }
+  }
+  animationFrame=requestAnimationFrame(draw);
+}
+
+function stopDemoAnimation(){
+  if(animationFrame!==null){
+    cancelAnimationFrame(animationFrame);
+    animationFrame=null;
+  }
+}
+
+/* AD COMPLETE */
+function finishAd(){
+  adCompleted=true;
+  stopDemoAnimation();
+  document.getElementById("videoTimer").textContent="Completed";
+  document.getElementById("videoProgress").style.width="100%";
+  document.getElementById("videoStatus").textContent="Ad completed!";
+  document.getElementById("videoPlayingScreen").style.display="none";
+  document.getElementById("rewardScreen").style.display="block";
+  document.getElementById("rewardAmount").textContent="₹"+activeAdReward.toFixed(2);
+}
+
+/* CLAIM REWARD */
+function claimAdReward(){
+  if(!adCompleted||adClaimed||activeAdReward<=0)return;
+
+  document.getElementById("claimButton").disabled=true;
+  availableBalance=Number((availableBalance+activeAdReward).toFixed(2));
+  saveBalance();
+  updateBalanceDisplays();
+  adClaimed=true;
+
+  document.getElementById("claimedBalance").textContent=formatBalance();
+  document.getElementById("rewardScreen").style.display="none";
+  document.getElementById("claimedScreen").style.display="block";
+}
+
+function closeAdPopup(){
+  if(adTimer!==null){
+    clearInterval(adTimer);
+    adTimer=null;
+  }
+  stopDemoAnimation();
+  document.getElementById("videoModal").style.display="none";
+  document.getElementById("videoPlayingScreen").style.display="block";
+  document.getElementById("rewardScreen").style.display="none";
+  document.getElementById("claimedScreen").style.display="none";
+  document.querySelectorAll(".ad-watch").forEach(btn=>btn.disabled=false);
+  activeAdReward=0;
+  activeAd=null;
+  adCompleted=false;
+  adClaimed=false;
+  document.getElementById("claimButton").disabled=false;
+}
+
+/* PROFILE */
+let selectedPhoto=null;
+
+function updateProfilePages(){
+  const name=localStorage.getItem("profileName")||"Mr. Balaram Maity";
+  const photo=localStorage.getItem("profilePhoto");
+
+  document.getElementById("userName").textContent=name;
+  document.getElementById("adsUserName").textContent=name;
+  document.getElementById("rechargeUserName").textContent=name;
+
+  ["adsAvatar","rechargeAvatar"].forEach(id=>{
+    const el=document.getElementById(id);
+    el.innerHTML="";
+    if(photo){
+      const img=document.createElement("img");
+      img.src=photo;
+      el.appendChild(img);
+    }else{
+      el.textContent="BM";
+    }
+  });
+}
+
+function loadProfile(){
+  const name=localStorage.getItem("profileName");
+  const photo=localStorage.getItem("profilePhoto");
+  if(name)document.getElementById("userName").textContent=name;
+
+  if(photo){
+    document.getElementById("mainAvatar").innerHTML='<img src="'+photo+'" alt="Profile">';
+  }
+  updateProfilePages();
+}
+
+function openEditor(){
+  document.getElementById("editModal").style.display="flex";
+  document.getElementById("nameInput").value=localStorage.getItem("profileName")||"Mr. Balaram Maity";
+  const photo=localStorage.getItem("profilePhoto");
+  document.getElementById("preview").innerHTML=photo?'<img src="'+photo+'" alt="Preview">':"BM";
+}
+
+function closeEditor(){
+  document.getElementById("editModal").style.display="none";
+}
+
+document.getElementById("photoInput").addEventListener("change",function(){
+  const file=this.files[0];
+  if(!file)return;
+  if(!file.type.startsWith("image/")){alert("Please select an image.");return}
+  if(file.size>2*1024*1024){alert("Please choose an image smaller than 2 MB.");this.value="";return}
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    selectedPhoto=e.target.result;
+    document.getElementById("preview").innerHTML='<img src="'+selectedPhoto+'" alt="Preview">';
+  };
+  reader.readAsDataURL(file);
+});
+
+function saveProfile(){
+  const name=document.getElementById("nameInput").value.trim();
+  if(!name){alert("Please enter your name.");return}
+
+  try{
+    localStorage.setItem("profileName",name);
+    if(selectedPhoto)localStorage.setItem("profilePhoto",selectedPhoto);
+  }catch(e){
+    alert("Storage is full. Please choose a smaller photo.");
+    return;
+  }
+
+  selectedPhoto=null;
+  document.getElementById("photoInput").value="";
+  loadProfile();
+  closeEditor();
+  alert("Profile updated successfully!");
+}
+
+/* DEMO PAYOUT LIST */
+const payoutUsers=[
+  ["Chris2025","C","#e879a6"],["Beatriz","B","#9275db"],
+  ["Earlybird","E","#36a9a1"],["Alexander","A","#e69a50"],
+  ["Sophia","S","#6596db"],["Daniel","D","#b76cc8"],
+  ["Olivia","O","#e47d72"],["Michael","M","#5dbaa0"],
+  ["Emma","E","#cf86b4"],["William","W","#8c8ed8"],
+  ["Ava","A","#d69c51"],["James","J","#549bbd"]
+];
+
+function generatePayouts(){
+  const list=document.getElementById("payoutList");
+  const time=new Date().toLocaleString("en-IN");
+  document.getElementById("updatedTime").textContent="Daily session: "+time;
+  list.innerHTML="";
+
+  payoutUsers.forEach(user=>{
+    const item=document.createElement("div");
+    item.className="payout-item";
+    const avatar=document.createElement("div");
+    avatar.className="payout-avatar";
+    avatar.style.background=user[2];
+    avatar.textContent=user[1];
+
+    const details=document.createElement("div");
+    details.className="payout-details";
+    const name=document.createElement("h3");
+    name.textContent=user[0];
+    const date=document.createElement("p");
+    date.textContent=time;
+    const status=document.createElement("div");
+    status.className="payout-status";
+    status.textContent="● Recharge successfully";
+    details.append(name,date,status);
+
+    const amount=document.createElement("div");
+    amount.className="payout-amount";
+    amount.textContent="₹"+(Math.random()*1800+200).toFixed(2);
+    item.append(avatar,details,amount);
+    list.appendChild(item);
+  });
+}
+
+/* RECHARGE PLANS */
+const plans=[
+  {operator:"Jio",amount:349,validity:"28 Days",data:"Unlimited 5G + 2GB/day",description:"Jio Special benefits: True 5G Unlimited Plan + JioHotstar Mobile + Canva Pro Lite...",extra:"Calls: Unlimited | SMS: As per plan. Demo plan information."},
+  {operator:"Jio",amount:29,validity:"2 Days",data:"2 GB",description:"Data Only Pack (No Voice & No SMS).",extra:"Data: 2 GB. Data-only sample plan."},
+  {operator:"Jio",amount:200,validity:"28 Days",data:"30 GB",description:"Jio OTT Pass (No Calls & No SMS) - Sample plan.",extra:"Sample OTT plan information."},
+  {operator:"Vi",amount:26,validity:"1 Day",data:"1.5 GB",description:"ADD-ON Data pack - 1.5 GB for 1 Day.",extra:"Data: 1.5 GB. Sample plan information."},
+  {operator:"Vi",amount:349,validity:"28 Days",data:"1.5 GB/Day",description:"Vi Prepaid plan - Sample plan information.",extra:"Validity: 28 Days. Data: 1.5 GB per day."},
+  {operator:"Airtel",amount:299,validity:"28 Days",data:"1.5 GB/day",description:"Calls: Unlimited. Data: 1.5 GB/day.",extra:"Sample Airtel plan information."},
+  {operator:"Airtel",amount:349,validity:"28 Days",data:"2 GB/day",description:"Calls: Unlimited. Data: 2 GB/day.",extra:"Sample Airtel plan information."},
+  {operator:"Airtel",amount:22,validity:"1 Day",data:"1 GB",description:"Data: 1GB. Valid for the same day.",extra:"Sample Airtel plan information."}
+];
+
+let selectedOperator="";
+let currentPlan=null;
+let demoHistory=[];
+let transactionCounter=1;
+
+function selectOperator(operator){
+  selectedOperator=operator;
+  document.querySelectorAll(".operator").forEach(button=>{
+    button.classList.toggle("active",button.dataset.operator===operator);
+  });
+  showPlan();
+}
+
+document.getElementById("amount").addEventListener("input",showPlan);
+
+function showPlan(){
+  const amount=Number(document.getElementById("amount").value);
+  const details=document.getElementById("details");
+  currentPlan=null;
+
+  if(!selectedOperator){
+    details.innerHTML='<div class="empty-message">Please select an operator first.</div>';
+    return;
+  }
+  if(!amount){
+    details.innerHTML='<div class="empty-message">Enter an amount to see the matching plan.</div>';
+    return;
+  }
+
+  const plan=plans.find(p=>p.operator===selectedOperator&&p.amount===amount);
+  if(!plan){
+    details.innerHTML='<div class="empty-message">Plan Not Found<br>No matching demo plan for '+selectedOperator+' ₹'+amount+'.</div>';
+    return;
+  }
+
+  currentPlan=plan;
+  details.innerHTML=`
+    <div class="plan-card">
+      <div class="plan-top">
+        <button class="change-plan" onclick="clearAmount()">Change Plan</button>
+        <div class="plan-price">₹${plan.amount}</div>
+        <div class="plan-meta">
+          <div>Validity<strong>${plan.validity}</strong></div>
+          <div>Data<strong>${plan.data}</strong></div>
+        </div>
+      </div>
+      <div class="plan-description">
+        ${plan.description}
+        <br><span class="plan-details" onclick="toggleExtra()">Details</span>
+      </div>
+      <div class="details-extra" id="extraDetails">${plan.extra}</div>
+    </div>`;
+}
+
+function clearAmount(){
+  document.getElementById("amount").value="";
+  currentPlan=null;
+  showPlan();
+}
+function toggleExtra(){
+  const el=document.getElementById("extraDetails");
+  if(el)el.style.display=el.style.display==="block"?"none":"block";
+}
+
+/* RECHARGE */
+function rechargeNow(){
+  const mobile=document.getElementById("mobile").value.trim();
+  const button=document.getElementById("rechargeButton");
+
+  if(!selectedOperator){alert("Please select an operator first.");return}
+  if(!/^[0-9]{10}$/.test(mobile)){alert("Please enter a valid 10-digit mobile number.");return}
+  if(!currentPlan){alert("Please enter an amount with a matching plan.");return}
+  if(button.disabled)return;
+
+  const amount=Number(currentPlan.amount);
+  if(amount>availableBalance){alert("Insufficient balance! Available: "+formatBalance());return}
+
+  button.disabled=true;
+  document.getElementById("loadingModal").style.display="flex";
+
+  const info={
+    operator:selectedOperator,
+    mobile:mobile,
+    amount:amount,
+    date:new Date().toLocaleString("en-IN"),
+    transactionId:"IP-address"+String(transactionCounter++).padStart(6,"0")
+  };
+
+  setTimeout(()=>{
+    document.getElementById("loadingModal").style.display="none";
+    availableBalance=Number((availableBalance-amount).toFixed(2));
+    saveBalance();
+    updateBalanceDisplays();
+
+    document.getElementById("successOperator").textContent=info.operator;
+    document.getElementById("successMobile").textContent=info.mobile;
+    document.getElementById("successAmount").textContent="₹"+info.amount;
+    document.getElementById("successDate").textContent=info.date;
+    document.getElementById("successTxn").textContent=info.transactionId;
+
+    demoHistory.unshift(info);
+    document.getElementById("successModal").style.display="flex";
+    button.disabled=false;
+  },1800);
+}
+
+function closeSuccess(){
+  document.getElementById("successModal").style.display="none";
+}
+
+/* HISTORY */
+function openHistory(){
+  const box=document.getElementById("historyText");
+  if(demoHistory.length===0){
+    box.innerHTML="<p>No recharge attempts yet.</p>";
+  }else{
+    box.innerHTML=demoHistory.map(item=>
+      "<p><b>"+item.operator+"</b><br>Mobile: "+item.mobile+
+      "<br>Amount: ₹"+item.amount+"<br>"+item.date+
+      "<br>Transaction ID: "+item.transactionId+"</p><hr>"
+    ).join("");
+  }
+  document.getElementById("historyModal").style.display="flex";
+}
+function closeHistory(){
+  document.getElementById("historyModal").style.display="none";
+}
+
+/* START */
+function startApp(){
+  loadProfile();
+  generatePayouts();
+  updateBalanceDisplays();
+}
+startApp();
+</script>
+</body>
+</html>
