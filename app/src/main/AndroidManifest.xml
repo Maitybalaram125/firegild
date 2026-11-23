@@ -6,7 +6,9 @@
     <application
         android:allowBackup="false"
         android:label="FIREGILD"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        android:icon="@drawable/ic_launcher"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name="com.firegild.app.MainActivity"
@@ -20,4 +22,5 @@
         </activity>
 
     </application>
+
 </manifest>
